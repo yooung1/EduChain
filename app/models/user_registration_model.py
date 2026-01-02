@@ -1,0 +1,12 @@
+from sqlmodel import SQLModel, Field
+from typing import Optional
+from app.constants.user_registration_model_constants import UserRole
+
+
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_type: UserRole = Field(default=UserRole.STUDENT)
+    username: str = Field(unique=True, index=True)
+    email: str = Field(unique=True)
+    hashed_password: str
+    is_active: bool = Field(default=True)
