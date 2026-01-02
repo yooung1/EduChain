@@ -5,13 +5,20 @@ from app.database.database import get_db, create_db_and_tables
 from app.models.user_registration_model import User
 from app.constants.user_registration_model_constants import UserRole
 from sqlmodel import select
+from contextlib import asynccontextmanager
 
 
-app = FastAPI()
 
-@app.on_event("startup")
-def on_startup():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_db_and_tables()
+
+    yield
+
+
+
+app = FastAPI(lifespan=lifespan)
 
 @app.post("/create/user", response_model=UserPublic)
 def create_user(user_input: UserCreate, db: Session = Depends(get_db)):
