@@ -2,14 +2,16 @@ from fastapi.testclient import TestClient
 from app.api.main import app
 from app.constants.user_registration_model_constants import UserRole
 
+
+
 client = TestClient(app)
 
 
 
 #TODO: MOCKAR OS TESTES PARA NAO CRIAR NADA NO BANCO DE DADOS
 def test_create_user():
-    username = "testenovo02"
-    email = "testenovo02@gmail.com"
+    username = "testenovo001"
+    email = "testenovo001@gmail.com"
     password = "password"
     user_type = UserRole.STUDENT
 
