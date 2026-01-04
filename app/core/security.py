@@ -8,6 +8,11 @@ class RoleChecker:
     def __init__(self, allowed_roles: list[UserRole]):
         self.allowed_roles = allowed_roles
 
+
+    def get_current_user(self):
+        ...
+
+        
     def __call__(self, user: User = Depends(get_current_user)):
         if user.user_type not in self.allowed_roles:
             raise HTTPException(
@@ -16,3 +21,5 @@ class RoleChecker:
             )
 
         return user
+    
+    
