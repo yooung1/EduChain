@@ -6,7 +6,7 @@ from app.models.user_registration_model import User
 from app.constants.user_registration_model_constants import UserRole
 from sqlmodel import select
 from contextlib import asynccontextmanager
-
+from app.core.security import RoleChecker
 
 
 
@@ -38,7 +38,7 @@ def create_user(user_input: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.get("/users")
+@app.get("/users", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))])
 def get_users(db: Session = Depends(get_db)):
     statement = select(User)
     
