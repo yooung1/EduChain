@@ -13,3 +13,6 @@ wheels/
 # files 
 project_overview.md
 database.db
+PYDANTIC - BASEMODEL.md
+FAST_API_DOC.md
+educhain.db
