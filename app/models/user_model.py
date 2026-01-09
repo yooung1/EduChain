@@ -1,17 +1,21 @@
-from sqlalchemy import Column, Integer, String, Enum as SqlEnum
-from ..db.database import Base
+from sqlmodel import SQLModel, Field
+from sqlalchemy import Column, Enum as SqlEnum
 from app.enums.user_enum import UserRole
+from typing import Optional
 
-
-
-
-class User(Base):
+class User(SQLModel, table=True):
     __tablename__ = "users"
 
-    id = Column(Integer, unique=True, primary_key=True, index=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    username = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    role = Column(SqlEnum(UserRole), default=UserRole.STUDENT)
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    
+    first_name: str = Field(nullable=False)
+    last_name: str = Field(nullable=False)
+    username: str = Field(unique=True, nullable=False)
+    email: str = Field(unique=True, index=True, nullable=False)
+    hashed_password: str = Field(nullable=False, min_length=4)
+    
+    role: UserRole = Field(
+        sa_column=Column(SqlEnum(UserRole), nullable=False)
+    )
+
+
