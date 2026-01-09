@@ -1,5 +1,3 @@
-from fastapi.testclient import TestClient
-from app.main import app
 from fastapi import status
 
 
@@ -78,3 +76,44 @@ def test_get_users(client):
     data = response.json()
     assert data[0]["first_name"] == first_name1
     assert data[1]["first_name"] == first_name2
+
+
+def test_login(client):
+    # create user 
+    URL =  "/api/v1/users/create/student/"
+    LOGIN_URL =  "/api/v1/login"
+    first_name = "Ana"
+    last_name = "Silva"
+    username = "ana.silva1"
+    email = "ana.silva1@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(
+        URL,
+        json=payload
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+    login_payload = {
+        "username": username,
+        "password": password
+    }
+
+    response = client.post(LOGIN_URL, data=login_payload)
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    data = response.json()
+
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+
