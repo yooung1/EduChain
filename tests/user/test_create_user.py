@@ -117,3 +117,6 @@ def test_login(client):
     assert data["token_type"] == "bearer"
 
 
+# TODO: CREATE A TEACHER WITH ADMIN ACCESS
+def test_create_teacher(client):
+    pass
