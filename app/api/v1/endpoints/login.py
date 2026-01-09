@@ -5,15 +5,19 @@ from app.db.database import get_db
 from app.models.user_model import User
 from app.core.security import verify_password, create_access_token
 from app.errors.login_errors import UserOrPasswordIncorrect
+from typing import Annotated
+from sqlmodel import select
+
 
 router = APIRouter()
+db = Annotated[Session, Depends(get_db)]
+
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == form_data.username).first()
+def login(db: db, form_data: OAuth2PasswordRequestForm = Depends()) -> dict[str, str]:
+    statement = select(User).where(User.username == form_data.username)
+    user = db.exec(statement).first()
 
-    print(user.hashed_password)
-    print(form_data.password)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise UserOrPasswordIncorrect()
 
