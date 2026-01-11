@@ -13,7 +13,7 @@ from app.errors.user_errors import (
 )
 from sqlmodel import select, Session, SQLModel
 from app.enums.user_enum import UserRole
-from app.user.models import commit_new_user
+from app.user.service import commit_new_user
 
 
 SQLModel.metadata.create_all(engine)
