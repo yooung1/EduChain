@@ -1,6 +1,6 @@
 from fastapi import Depends, status, APIRouter
 from app.db.database import engine, get_db
-from app.models.user_model import User
+from app.user.model import User
 from app.user.schemas import (
     UserBase,
     UserCreate,
