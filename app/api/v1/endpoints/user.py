@@ -19,7 +19,7 @@ db = Annotated[Session, Depends(get_db)]
 
 
 @router.get("/", response_model=List[user_schema.UserPublic], status_code=status.HTTP_200_OK)
-def get_users(db: db) -> Session:
+def get_users(db: db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN]))) -> Session:
     return db.exec(select(User)).all()
 
 
@@ -42,7 +42,7 @@ def create_student(user: user_schema.UserCreate, db: db) -> User:
 
     db.add(new_user)
     db.commit()
-    db.refresh(new_user) # Pega o ID gerado pelo banco
+    db.refresh(new_user)
 
     return new_user
 
@@ -61,6 +61,30 @@ def create_teacher(user: user_schema.UserCreate, db: db, allowed_roles: User = D
         username=user.username,
         email=user.email,
         role=UserRole.TEACHER,
+        hashed_password=get_password_hash(password=user.password), 
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
+
+
+@router.post("/create/admin", status_code=status.HTTP_201_CREATED, response_model=user_schema.UserPublic)
+def create_admin(user: user_schema.UserCreate, db: db, allowed_roles: User = Depends(CheckRole([UserRole.ADMIN]))):
+    statement = select(User).where((User.email == user.email) | (User.username == user.username))
+    db_user = db.exec(statement).first()
+
+    if db_user:
+        raise UsernameOrEmailExist()
+    
+    new_user = User(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        username=user.username,
+        email=user.email,
+        role=UserRole.ADMIN,
         hashed_password=get_password_hash(password=user.password), 
     )
 
