@@ -1,6 +1,5 @@
 import jwt
-# from app.user.models import User
-from app.models.user_model import User
+from app.user.models import User
 from datetime import datetime, timedelta, timezone
 from pwdlib import PasswordHash
 from fastapi.security import OAuth2PasswordBearer
