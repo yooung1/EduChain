@@ -120,3 +120,8 @@ def test_login(client):
 # TODO: CREATE A TEACHER WITH ADMIN ACCESS
 def test_create_teacher(client):
     pass
+
+
+# TODO: CREATE A TEACHER WITH ADMIN ACCESS
+def test_create_admin(client):
+    pass
