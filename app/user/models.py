@@ -1,10 +1,7 @@
 from app.enums.user_enum import UserRole
-from app.auth.service import get_password_hash
-from sqlmodel import Session
 from sqlmodel import SQLModel, Field
 from sqlalchemy import Column, Enum as SqlEnum
 from typing import Optional
-from app.models.user_model import User
 
 
 class User(SQLModel, table=True):

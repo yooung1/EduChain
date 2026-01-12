@@ -1,7 +1,7 @@
-from app.user.schema import UserRole
+from app.user.schemas import UserRole
 from app.user.models import User
 from sqlmodel import Session
-
+from app.auth.service import get_password_hash
 
 
 
