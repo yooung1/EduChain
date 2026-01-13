@@ -101,7 +101,6 @@ def client_fixture(session):
     yield client
     app.dependency_overrides.clear()
 
-#TODO: ENVIAR TODAS ESSAS VARIAVEIS NO ARQUIVO DE CONSTANTES.PY -- variaveis de acesso, etc.
 @pytest.fixture(name="login_as_admin")
 def login_as_admin_fixture(client):
     user_data = {
