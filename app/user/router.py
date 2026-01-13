@@ -22,8 +22,7 @@ db = Annotated[Session, Depends(get_db)]
 
 
 @user_router.get("/", response_model=List[UserPublic], status_code=status.HTTP_200_OK)
-# def get_users(db: db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN]))) -> Session:
-def get_users(db: db) -> Session:
+def get_users(db: db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN]))) -> Session:
     return db.exec(select(User)).all()
 
 
@@ -36,7 +35,6 @@ def create_student(user: UserCreate, db: db) -> User:
         raise UsernameOrEmailExist()
 
     new_user = commit_new_user(user_role=UserRole.STUDENT, user=user, db=db)
-
     return new_user
 
 
