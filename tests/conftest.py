@@ -7,6 +7,27 @@ from app.models.user_model import User
 from app.user.schemas import UserRole
 from app.auth.service import get_password_hash
 from fastapi import status
+from tests.constants import (
+    # Admin
+    ADMIN_FIRST_NAME,
+    ADMIN_LASTNAME,
+    ADMIN_USERNAME,
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD,
+    # Student
+    STUDENT_FIRST_NAME,
+    STUDENT_LASTNAME,
+    STUDENT_USERNAME,
+    STUDENT_EMAIL,
+    STUDENT_PASSWORD,
+    # Teacher
+    TEACHER_FIRST_NAME,
+    TEACHER_LASTNAME,
+    TEACHER_USERNAME,
+    TEACHER_EMAIL,
+    TEACHER_PASSWORD
+)
+
 
 
 @pytest.fixture(scope="session", name="engine")
@@ -32,45 +53,35 @@ def session_fixture(engine):
     session = Session(bind=connection)
     
     # CREATING ADMIN USER
-    admin_user = User(
-        first_name="super_admin",
-        last_name="super_admin",
-        username="super_admin",
-        email="teste_teste@gmail.com",
-        hashed_password=get_password_hash("senha_super_admin"),
-        role=UserRole.ADMIN
-    )
-    session.add(admin_user)
+    users_to_create = [
+        User(
+            first_name=ADMIN_FIRST_NAME,
+            last_name=ADMIN_LASTNAME,
+            username=ADMIN_USERNAME,
+            email=ADMIN_EMAIL,
+            hashed_password=get_password_hash(ADMIN_PASSWORD),
+            role=UserRole.ADMIN
+        ),
+        User(
+            first_name=STUDENT_FIRST_NAME,
+            last_name=STUDENT_LASTNAME,
+            username=STUDENT_USERNAME,
+            email=STUDENT_EMAIL,
+            hashed_password=get_password_hash(STUDENT_PASSWORD),
+            role=UserRole.STUDENT
+        ),
+        User(
+            first_name=TEACHER_FIRST_NAME,
+            last_name=TEACHER_LASTNAME,
+            username=TEACHER_USERNAME,
+            email=TEACHER_EMAIL,
+            hashed_password=get_password_hash(TEACHER_PASSWORD),
+            role=UserRole.TEACHER
+        )
+    ]
+
+    session.add_all(users_to_create)
     session.commit()
-    session.refresh(admin_user)
-
-    # CREATING STUDENT USER
-    student_user = User(
-        first_name="student",
-        last_name="student",
-        username="student",
-        email="student@gmail.com",
-        hashed_password=get_password_hash("senha_student"),
-        role=UserRole.STUDENT
-    )
-    session.add(student_user)
-    session.commit()
-    session.refresh(student_user)
-
-
-    # CREATING TEACHER USER
-    teacher_user = User(
-        first_name="teacher",
-        last_name="teacher",
-        username="teacher",
-        email="teacher@gmail.com",
-        hashed_password=get_password_hash("senha_teacher"),
-        role=UserRole.TEACHER
-    )
-    session.add(teacher_user)
-    session.commit()
-    session.refresh(teacher_user)
-
 
     yield session
 
@@ -94,8 +105,8 @@ def client_fixture(session):
 @pytest.fixture(name="login_as_admin")
 def login_as_admin_fixture(client):
     user_data = {
-        "username": "super_admin",
-        "password": "senha_super_admin",
+        "username": ADMIN_USERNAME,
+        "password": ADMIN_PASSWORD,
     }
     response = client.post("/api/v1/auth/login", data=user_data)
     assert response.status_code == status.HTTP_202_ACCEPTED
@@ -105,8 +116,8 @@ def login_as_admin_fixture(client):
 @pytest.fixture(name="login_as_student")
 def login_as_student_fixture(client):
     user_data = {
-        "username": "student",
-        "password": "senha_student",
+        "username": STUDENT_USERNAME,
+        "password": STUDENT_PASSWORD,
     }
     response = client.post("/api/v1/auth/login", data=user_data)
     assert response.status_code == status.HTTP_202_ACCEPTED
@@ -116,8 +127,8 @@ def login_as_student_fixture(client):
 @pytest.fixture(name="login_as_teacher")
 def login_as_teacher_fixture(client):
     user_data = {
-        "username": "teacher",
-        "password": "senha_teacher",
+        "username": TEACHER_USERNAME,
+        "password": TEACHER_PASSWORD,
     }
     response = client.post("/api/v1/auth/login", data=user_data)
     assert response.status_code == status.HTTP_202_ACCEPTED
