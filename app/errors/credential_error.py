@@ -8,4 +8,4 @@ class CredentialException(ErrorBase):
 
 class UserNotAllowed(ErrorBase):
     detail = "This user has no permission to execute this process"
-    status_code = status.HTTP_403_FORBIDDEN
+    status_code = status.HTTP_401_UNAUTHORIZED
