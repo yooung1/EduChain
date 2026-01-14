@@ -7,6 +7,7 @@ from sqlmodel import Session, select
 from app.auth.service import CheckRole
 from app.user.router import UserRole
 from app.course.service import commit_new_course
+from app.errors.course_errors import CourseDoentsExist
 
 
 course_router = APIRouter(prefix="/course")
@@ -24,3 +25,16 @@ def create_course(db: db, course_data: CourseSchema, allowed_roles: UserRole = D
     new_course = commit_new_course(course_data=course_data, db=db)
 
     return new_course
+
+
+@course_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_course(db: db, id: int, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> None:
+    course = db.get(Course, id)
+
+    if not course:
+        raise CourseDoentsExist()
+    
+    db.delete(course)
+    db.commit()
+
+    return None
