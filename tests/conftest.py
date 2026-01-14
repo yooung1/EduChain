@@ -3,7 +3,7 @@ from sqlmodel import SQLModel, create_engine, Session, StaticPool
 from fastapi.testclient import TestClient
 from app.main import app
 from app.db.database import get_db
-from app.models.user_model import User
+from app.user.models import User
 from app.user.schemas import UserRole
 from app.auth.service import get_password_hash
 from fastapi import status
