@@ -11,5 +11,9 @@ class Course(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(nullable=False)
     description: str = Field(nullable=False)
-    klasses: List["Klass"] = Relationship(back_populates="course")
-
+    klasses: List["Klass"] = Relationship(
+        back_populates="course",
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan"
+        }
+    )
