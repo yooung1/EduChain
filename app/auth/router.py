@@ -9,7 +9,7 @@ from typing import Annotated
 from sqlmodel import select
 
 
-auth_router = APIRouter(prefix="/auth")
+auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 db = Annotated[Session, Depends(get_db)]
 
 
