@@ -14,8 +14,7 @@ def test_create_course(client, login_as_teacher):
     assert response.status_code == status.HTTP_201_CREATED
 
 
-def test_create_course_with_no_permission(client, login_as_admin, login_as_student):
-    admin_perm = {"Authorization": f"Bearer {login_as_admin}"}
+def test_create_course_with_no_permission(client, login_as_student):
     student_perm = {"Authorization": f"Bearer {login_as_student}"}
 
     URL = "/api/v1/course/create"
@@ -25,8 +24,6 @@ def test_create_course_with_no_permission(client, login_as_admin, login_as_stude
         "description": "ESTE CURSO VAI TE ENSINAR A CODAR DA MELHOR MANEIRA QUE EXISTE"
     }
 
-    response = client.post(url=URL, json=payload, headers=admin_perm)
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     response = client.post(url=URL, json=payload, headers=student_perm)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -60,3 +57,23 @@ def test_get_course_with_no_permission(client, login_as_student):
 
     response = client.get(url=URL)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_delete_course(client, login_as_admin):
+    headers = {"Authorization": f"Bearer {login_as_admin}"}
+    URL_CREATE = "/api/v1/course/create"
+    URL = "/api/v1/course/delete/1"
+
+    payload = {
+        "name": "COMO CODAR BEM",
+        "description": "ESTE CURSO VAI TE ENSINAR A CODAR DA MELHOR MANEIRA QUE EXISTE"
+    }
+
+    response = client.post(url=URL_CREATE, json=payload, headers=headers)
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # Delete course
+    response = client.delete(url=URL, headers=headers)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
