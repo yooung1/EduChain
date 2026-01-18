@@ -24,7 +24,7 @@ def get_courses(db: db, allowed_roles: UserRole = Depends(CheckRole([UserRole.AD
 
 
 @course_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=CourseSchemaPost)
-def create_course(db: db, course_data: CourseSchemaPost, allowed_roles: UserRole = Depends(CheckRole([UserRole.TEACHER]))) -> Course:
+def create_course(db: db, course_data: CourseSchemaPost, allowed_roles: UserRole = Depends(CheckRole([UserRole.TEACHER, UserRole.ADMIN]))) -> Course:
     new_course = commit_new_course(course_data=course_data, db=db)
 
     return new_course
