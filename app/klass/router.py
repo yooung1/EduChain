@@ -14,14 +14,14 @@ klass_router = APIRouter(prefix="/klass", tags=["Klass"])
 db = Annotated[Session, Depends(get_db)]
 
 
-@klass_router.get("/", status_code=status.HTTP_202_ACCEPTED, response_model=List[KlassSchemaPublic])
+@klass_router.get("/", status_code=status.HTTP_200_OK, response_model=List[KlassSchemaPublic])
 def get_klasses(db: db,  allowed_rolles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> Session:
     statement = select(Klass)
     return db.exec(statement).all()
 
 
-@klass_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=KlassSchemaPublic)
-def create_klass(klass: KlassSchemaPost, db: db, allowed_rolles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))):
+@klass_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=List[KlassSchemaPublic])
+def create_klass(klass: List[KlassSchemaPost], db: db, allowed_rolles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))):
     return create_new_klass(db=db, new_klass=klass)
 
 
