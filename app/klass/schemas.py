@@ -3,7 +3,6 @@ from typing import Optional
 
 
 class KlassSchemaPost(BaseModel):
-    id: Optional[int] = None
     name: str = Field(min_length=5)
     video: str = Field(min_length=5)
     description: str = Field(min_length=10)
