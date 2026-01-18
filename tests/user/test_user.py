@@ -1,0 +1,222 @@
+from fastapi import status
+from app.user.schemas import UserRole
+
+
+def test_create_student(client):
+    URL =  "/api/v1/users/create/student/"
+    first_name = "Ana"
+    last_name = "Silva"
+    username = "ana.silva1"
+    email = "ana.silva1@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(
+        URL,
+        json=payload,
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+    assert data["username"] == username
+    assert data["first_name"] == first_name
+    assert "id" in data
+
+
+def test_get_users(client, login_as_admin):
+    headers = {"Authorization": f"Bearer {login_as_admin}"}
+    CREATE_USER_URL =  "/api/v1/users/create/student/"
+    GET_USER_URL =  "/api/v1/users/"
+    
+    # create first user
+    first_name1 = "Ana"
+    last_name1 = "Silva"
+    username1 = "ana.silva1"
+    email1 = "ana.silva1@example.com"
+    password1 = "senha12312312334"
+
+    payload = {
+        "first_name": first_name1,
+        "last_name": last_name1,
+        "username": username1,
+        "email": email1,
+        "password": password1
+    }
+
+    response = client.post(
+        CREATE_USER_URL,
+        json=payload,
+        headers=headers)
+    
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    # create second user
+    first_name2 = "Lucas"
+    last_name2 = "Silva"
+    username2 = "ana.silva21"
+    email2 = "lucas.silva21@example.com"
+    password2 = "senha12312312334"
+
+    payload = {
+        "first_name": first_name2,
+        "last_name": last_name2,
+        "username": username2,
+        "email": email2,
+        "password": password2
+    }
+
+    response = client.post(CREATE_USER_URL, json=payload)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+
+def test_login(client):
+    URL =  "/api/v1/users/create/student/"
+    LOGIN_URL =  "/api/v1/auth/login"
+    first_name = "Ana"
+    last_name = "Silva"
+    username = "ana.silva1"
+    email = "ana.silva1@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(
+        URL,
+        json=payload
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+    login_payload = {
+        "username": username,
+        "password": password
+    }
+
+    response = client.post(LOGIN_URL, data=login_payload)
+    assert response.status_code == status.HTTP_202_ACCEPTED
+    data = response.json()
+
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+
+
+def test_create_teacher(client, login_as_admin):
+    headers = {"Authorization": f"Bearer {login_as_admin}"}
+    URL = "/api/v1/users/create/teacher"
+    first_name = "Ana"
+    last_name = "Silva"
+    username = "ana.silva1"
+    email = "ana.silva1@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(url=URL, json=payload, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+    
+    assert data["role"] == UserRole.TEACHER
+
+
+def test_create_teacher_with_no_authorization(client, login_as_teacher, login_as_student):
+    teacher_login = {"Authorization": f"Bearer {login_as_teacher}"}
+    student_login = {"Authorization": f"Bearer {login_as_student}"}
+    URL = "/api/v1/users/create/teacher"
+    first_name = "Ana"
+    last_name = "Silva"
+    username = "ana.silva1"
+    email = "ana.silva1@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(url=URL, json=payload, headers=teacher_login)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = client.post(url=URL, json=payload, headers=student_login)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = client.post(url=URL, json=payload)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+
+def test_create_admin(client, login_as_admin):
+    headers = {"Authorization": f"Bearer {login_as_admin}"}
+
+    URL = "/api/v1/users/create/admin"
+    first_name = "ADmin"
+    last_name = "Admin"
+    username = "admin_222"
+    email = "adiadimin@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(url=URL, json=payload, headers=headers)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+
+def test_create_teacher_with_no_authorization(client, login_as_student, login_as_teacher):
+    student_login = {"Authorization": f"Bearer {login_as_student}"}
+    teacher_login = {"Authorization": f"Bearer {login_as_teacher}"}
+
+    URL = "/api/v1/users/create/admin"
+    first_name = "ADmin"
+    last_name = "Admin"
+    username = "admin_222"
+    email = "adiadimin@example.com"
+    password = "senha12312312334"
+
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "email": email,
+        "password": password
+    }
+
+    response = client.post(url=URL, json=payload, headers=student_login)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = client.post(url=URL, json=payload, headers=teacher_login)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = client.post(url=URL, json=payload)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
