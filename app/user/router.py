@@ -3,12 +3,14 @@ from app.db.database import engine, get_db
 from app.user.models import User
 from app.user.schemas import (
     UserCreate,
-    UserPublic
+    UserPublic,
+    UserUpdate
 )
 from typing import List, Annotated
 from app.auth.service import CheckRole
 from app.errors.user_errors import (
-    UsernameOrEmailExist
+    UsernameOrEmailExist,
+    UserDoesNotExist
 )
 from sqlmodel import select, Session, SQLModel
 from app.enums.user_enum import UserRole
@@ -62,3 +64,37 @@ def create_admin(user: UserCreate, db: db, allowed_roles: User = Depends(CheckRo
     new_user = commit_new_user(user_role=UserRole.ADMIN, user=user, db=db)
 
     return new_user
+
+
+# TODO: quando alterar o usuario verificar se o usuario ja existe -- email a mesma coisa
+@user_router.patch("/edit/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=UserPublic)
+def edit_user(id: int, data: UserUpdate, db:db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> Session:
+    user = db.get(User, id)
+
+    if not user:
+        raise UserDoesNotExist()
+    
+    data_to_update = data.model_dump(exclude_unset=True)
+
+    for key, value in data_to_update.items():
+        setattr(user, key, value)
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    return user
+
+
+@user_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(id: int, db: db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN]))) -> None:
+    user = db.get(User, id)
+
+    if not user:
+        raise UserDoesNotExist()
+    
+    db.delete(user)
+
+    db.commit()
+
+    return None
