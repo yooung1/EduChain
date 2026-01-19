@@ -7,5 +7,5 @@ class CredentialException(ErrorBase):
 
 
 class UserNotAllowed(ErrorBase):
-    detail = "This user has no permission to execute this process"
+    detail = "This user have no permission to execute this action"
     status_code = status.HTTP_401_UNAUTHORIZED
