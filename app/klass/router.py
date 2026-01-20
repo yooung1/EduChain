@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends
-from app.klass.schemas import KlassSchemaPublic, KlassSchemaPost
+from app.klass.schemas import KlassSchemaPublic, KlassSchemaPost, KlassSchemaUpdate
 from app.auth.service import CheckRole
 from app.user.service import UserRole
 from typing import Annotated, List
@@ -21,13 +21,31 @@ def get_klasses(db: db,  allowed_rolles: UserRole = Depends(CheckRole([UserRole.
 
 
 @klass_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=List[KlassSchemaPublic])
-def create_klass(klass: List[KlassSchemaPost], db: db, allowed_rolles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))):
+def create_klass(klass: List[KlassSchemaPost], db: db, allowed_rolles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> list[Klass]:
     return create_new_klass(db=db, new_klass=klass)
 
 
+@klass_router.patch("/edit/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=KlassSchemaPublic)
+def edit_klass(db: db, id: int, new_parameters: KlassSchemaUpdate, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> Klass:
+    klass = db.get(Klass, id)
+
+    if not klass:
+        raise KlassDoesNotExist()
+    
+    parameters_to_update = new_parameters.model_dump(exclude_unset=True)
+
+    for key, value in parameters_to_update.items():
+        setattr(klass, key, value)
+
+    db.add(klass)
+    db.commit()
+    db.refresh(klass)
+    
+    return klass
+
 
 @klass_router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_klass(db: db, id: int, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))):
+def delete_klass(db: db, id: int, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> None:
     klass = db.get(Klass, id)
     
     if not klass:
