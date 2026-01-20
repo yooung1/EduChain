@@ -9,6 +9,13 @@ class KlassSchemaPost(BaseModel):
     course_id: Optional[int]
 
 
+class KlassSchemaUpdate(BaseModel):
+    name: Optional[str] = None
+    video: Optional[str] = None
+    description: Optional[str] = None
+    course_id: Optional[int] = None
+
+
 class KlassSchemaPublic(KlassSchemaPost):
     id: Optional[int] = None
     name: str = Field(min_length=5)
