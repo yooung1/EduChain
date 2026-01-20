@@ -68,7 +68,7 @@ def create_admin(user: UserCreate, db: db, allowed_roles: User = Depends(CheckRo
 
 # TODO: quando alterar o usuario verificar se o usuario ja existe -- email a mesma coisa
 @user_router.patch("/edit/{id}", status_code=status.HTTP_202_ACCEPTED, response_model=UserPublic)
-def edit_user(id: int, data: UserUpdate, db:db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> Session:
+def edit_user(id: int, data: UserUpdate, db:db, allowed_roles: UserRole = Depends(CheckRole([UserRole.ADMIN, UserRole.TEACHER]))) -> User:
     user = db.get(User, id)
 
     if not user:
