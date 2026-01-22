@@ -2,6 +2,8 @@
 
 Este projeto está passando por atualizações e novas implementações.
 
+Este projeto serve apenas para aprender os metodos e boas praticas de desenvolvimento do FastAPI
+
 ### Trabalhando em:
 - [x] Cadastro de usuários (Estudantes)
 - [x] Listagem de usuários ativos/inativos
